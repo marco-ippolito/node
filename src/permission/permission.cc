@@ -5,6 +5,7 @@
 #include "node.h"
 #include "node_errors.h"
 #include "node_external_reference.h"
+#include "path_resolver.h"
 
 #include "v8.h"
 
@@ -48,6 +49,11 @@ static void Has(const FunctionCallbackInfo<Value>& args) {
     if (*utf8_arg == nullptr) {
       return;
     }
+
+    if (Path::IsAbsolutePath(*utf8_arg)) {
+     Path::Resolve(*utf8_arg);
+    }
+
     return args.GetReturnValue().Set(
         env->permission()->is_granted(scope, *utf8_arg));
   }

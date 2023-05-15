@@ -11,8 +11,7 @@ namespace permission {
 
 class Path {
  public:
-  Path();
-  static bool IsAbsolutePath(const std::string_view& path);
+  static bool IsAbsolute(const std::string_view& path);
 
   static std::string Resolve(const std::string_view& path);
 };

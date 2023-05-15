@@ -1,22 +1,14 @@
+#include "path_resolver.h"
 #include "v8.h"
 
+#include <stdlib.h>
 #include <unistd.h>
-#include <string>
-#include <string_view>
 
 namespace node {
 
-using v8::String;
-
 namespace permission {
 
-const int CHAR_FORWARD_SLASH = 47;
-
-const int CHAR_BACKWARD_SLASH = 92;
-
-const int CHAR_DOT = 46;
-
-bool IsAbsolutePath(const std::string_view& path) {
+static bool IsAbsolute(const std::string_view& path) {
 #if defined(_WIN32) || defined(_WIN64)
   return path.find(':') != std::string::npos;
 #else
@@ -24,12 +16,12 @@ bool IsAbsolutePath(const std::string_view& path) {
 #endif
 }
 
-std::string Resolve(const std::string_view& path) {
-  // if (CHECK_NULL(path)) {
-  //   path = GetWorkingDirectory();
-  // }
+static std::string Resolve(const std::string_view& path) {
+  if (CHECK_NULL(path)) {
+    *path = GetWorkingDirectory();
+  }
 
-  return "hello";
+  *path = NormalizePath(*path);
 }
 
 std::string GetWorkingDirectory() {
@@ -45,12 +37,31 @@ std::string GetWorkingDirectory() {
 #endif
 }
 
-bool IsPathSeparator(int code) {
-#if defined(_WIN32) || defined(_WIN64)
-  return code == CHAR_FORWARD_SLASH || code == CHAR_BACKWARD_SLASH;
-#else
-  return code == CHAR_FORWARD_SLASH;
-#endif
+std::string NormalizePath(const std::string& path) {
+  std::string absolute_path = path;
+  std::replace(absolute_path.begin(), absolute_path.end(), '\\', '/');
+  std::vector<std::string> segments;
+  std::istringstream segment_stream(absolute_path);
+  std::string segment;
+  while (std::getline(segment_stream, segment, '/')) {
+    if (segment == "..") {
+      if (!segments.empty()) segments.pop_back();
+    } else if (segment != ".") {
+      segments.push_back(segment);
+    }
+  }
+  // Join path segments.
+  std::ostringstream os;
+  if (segments.size() > 1) {
+    std::copy(segments.begin(),
+              segments.end() - 1,
+              std::ostream_iterator<std::string>(os, "/"));
+    os << *segments.rbegin();
+  } else {
+    os << "/";
+    if (!segments.empty()) os << segments[0];
+  }
+  return os.str();
 }
 
 }  // namespace permission

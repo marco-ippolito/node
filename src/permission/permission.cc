@@ -50,7 +50,7 @@ static void Has(const FunctionCallbackInfo<Value>& args) {
       return;
     }
 
-    if (Path::IsAbsolutePath(*utf8_arg)) {
+    if (Path::IsAbsolute(*utf8_arg)) {
      Path::Resolve(*utf8_arg);
     }
 

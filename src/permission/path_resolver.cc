@@ -18,10 +18,10 @@ static bool IsAbsolute(const std::string_view& path) {
 
 static std::string Resolve(const std::string_view& path) {
   if (CHECK_NULL(path)) {
-    *path = GetWorkingDirectory();
+    return GetWorkingDirectory();
   }
 
-  *path = NormalizePath(*path);
+  return NormalizePath(path);
 }
 
 std::string GetWorkingDirectory() {

@@ -1,0 +1,94 @@
+import { spawnPromisified } from '../common/index.mjs';
+import * as fixtures from '../common/fixtures.mjs';
+import { match, strictEqual } from 'node:assert';
+import { test } from 'node:test';
+
+test('expect failure of a mts file with commonjs syntax', async () => {
+  const result = await spawnPromisified(process.execPath, [
+    '--experimental-strip-types',
+    fixtures.path('typescript/mts/test-mts-but-commonjs-syntax.mts'),
+  ]);
+
+  strictEqual(result.stdout, '');
+  match(result.stderr, /require is not defined in ES module scope, you can use import instead/);
+  strictEqual(result.code, 1);
+});
+
+test('execute of a mts file import mts module', async () => {
+  const result = await spawnPromisified(process.execPath, [
+    '--experimental-strip-types',
+    fixtures.path('typescript/mts/test-import-module.mts'),
+  ]);
+
+  strictEqual(result.stderr, '');
+  match(result.stdout, /Hello, TypeScript!/);
+  strictEqual(result.code, 0);
+});
+
+test('execute a mts file importing ts module', async () => {
+  const result = await spawnPromisified(process.execPath, [
+    '--experimental-strip-types',
+    '--experimental-default-type=module', // this should fail
+    fixtures.path('typescript/mts/test-import-ts-file.mts'),
+  ]);
+
+  strictEqual(result.stderr, '');
+  match(result.stdout, /Hello, TypeScript!/);
+  strictEqual(result.code, 0);
+});
+
+test('execute a mts file importing cts module', async () => {
+  const result = await spawnPromisified(process.execPath, [
+    '--experimental-strip-types',
+    fixtures.path('typescript/mts/test-import-commonjs.mts'),
+  ]);
+
+  strictEqual(result.stderr, '');
+  match(result.stdout, /Hello, TypeScript!/);
+  strictEqual(result.code, 0);
+});
+
+test('execute of a mts file with wrong default module', async () => {
+  const result = await spawnPromisified(process.execPath, [
+    '--experimental-strip-types',
+    '--experimental-default-type=commonjs',
+    fixtures.path('typescript/mts/test-import-module.mts'),
+  ]);
+
+  strictEqual(result.stdout, '');
+  match(result.stderr, /Error \[ERR_REQUIRE_ESM\]: require\(\) of ES Module/);
+  strictEqual(result.code, 1);
+});
+
+test('execute of a mts file from node_modules', async () => {
+  const result = await spawnPromisified(process.execPath, [
+    '--experimental-strip-types',
+    fixtures.path('typescript/mts/test-mts-node_modules.mts'),
+  ]);
+
+  strictEqual(result.stderr, '');
+  match(result.stdout, /Hello, TypeScript!/);
+  strictEqual(result.code, 0);
+});
+
+test('execute of a cts file from node_modules', async () => {
+  const result = await spawnPromisified(process.execPath, [
+    '--experimental-strip-types',
+    fixtures.path('typescript/mts/test-cts-node_modules.mts'),
+  ]);
+
+  strictEqual(result.stderr, '');
+  match(result.stdout, /Hello, TypeScript!/);
+  strictEqual(result.code, 0);
+});
+
+test('execute of a ts file from node_modules', async () => {
+  const result = await spawnPromisified(process.execPath, [
+    '--experimental-strip-types',
+    fixtures.path('typescript/mts/test-ts-node_modules.mts'),
+  ]);
+
+  strictEqual(result.stderr, '');
+  match(result.stdout, /Hello, TypeScript!/);
+  strictEqual(result.code, 0);
+});

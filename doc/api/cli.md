@@ -1086,6 +1086,16 @@ added: v22.3.0
 
 Enable [snapshot testing][] in the test runner.
 
+### `--experimental-typescript`
+
+<!-- YAML
+added: REPLACEME
+-->
+
+> Stability: 1.0 - Early development
+
+Enable experimental TypeScript support.
+
 ### `--experimental-vm-modules`
 
 <!-- YAML

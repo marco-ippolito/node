@@ -1048,6 +1048,73 @@ returned object contains the following keys:
 * columnNumber: {number} The 1-indexed columnNumber of the
   corresponding call site in the original source
 
+## TypeScript support
+
+<!-- YAML
+added: REPLACEME
+-->
+
+> Stability: 1.0 - Early development
+
+It is possible to execute TypeScript files by setting the experimental
+flag [`--experimental-strip-types`][].
+Node.js will replace inline TypeScript types with whitespace.
+No type checking is performed, and types are discarded.
+TypeScript features that cannot be replaced by whitespace, such as enums, will error.
+As in JavaScript files, file extensions are required in `import` statements
+and `import()` expressions.
+TypeScript features that depend on settings within `tsconfig.json`,
+such as paths or converting module formats, are unsupported.
+
+> The flag [`--experimental-require-module`][] is currently not supported.
+
+### Limitations
+
+#### Determining module system
+
+Node.js supports both [CommonJS][] and [ES Modules][] TypeScript syntax.
+When executing TypeScript files, Node.js will not transpile the module system.
+Since all that Node.js is doing is removing inline types, any `import`, `require`,
+`export` or `module.exports` statements, will be run as written.
+
+* `.ts` files will by default be as CommonJS modules,
+  unless specified otherwise, similarly to `.js` files.
+* `.mts` and `.cts` files will be treated as `.mjs` and `.cjs` files respectively.
+* `.tsx` files are not supported.
+
+Importing [modules without extension][] is not supported,
+file extensions are **always** required:
+
+```ts
+  import { foo } from './foo'; // it will not work
+  import { foo } from './foo.ts'; // it will work
+```
+
+The `tsconfig.json` option
+`allowImportingTsExtensions` may help provide compatibility with other tools.
+
+#### TypeScript only features
+
+Since Node.js is only removing inline types, any TypeScript features that
+involve _replacing_ TypeScript syntax with new JavaScript syntax will error.
+This is by design. To run TypeScript with such features, see
+<https://nodejs.org/en/learn/getting-started/nodejs-with-typescript#running-typescript-code-in-nodejs>
+
+The most prominent unsupported features that require transformation are:
+
+* `Enum`
+* `experimentalDecorators`
+* `namespaces`
+
+#### REPL
+
+Executing source code in the REPL with TypeScript is not supported.
+This also applies to `--print`, `--check` and `inspect`.
+
+#### Source maps
+
+Currently source maps are not supported.
+
 [CommonJS]: modules.md
 [Conditional exports]: packages.md#conditional-exports
 [Customization hooks]: #customization-hooks
@@ -1056,6 +1123,8 @@ returned object contains the following keys:
 [Source map v3 format]: https://sourcemaps.info/spec.html#h.mofvlxcwqzej
 [`"exports"`]: packages.md#exports
 [`--enable-source-maps`]: cli.md#--enable-source-maps
+[`--experimental-require-module`]: cli.md#--experimental-require-module
+[`--experimental-strip-types`]: cli.md#--experimental-strip-types
 [`ArrayBuffer`]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer
 [`NODE_V8_COVERAGE=dir`]: cli.md#node_v8_coveragedir
 [`SharedArrayBuffer`]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/SharedArrayBuffer
@@ -1071,6 +1140,7 @@ returned object contains the following keys:
 [hooks]: #customization-hooks
 [load hook]: #loadurl-context-nextload
 [module wrapper]: modules.md#the-module-wrapper
+[modules without extension]: esm.md#mandatory-file-extensions
 [realm]: https://tc39.es/ecma262/#realm
 [source map include directives]: https://sourcemaps.info/spec.html#h.lmz475t4mvbx
 [transferrable objects]: worker_threads.md#portpostmessagevalue-transferlist

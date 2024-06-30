@@ -1,0 +1,83 @@
+'use strict';
+const { spawnPromisified } = require('../common');
+const { match, strictEqual } = require('node:assert');
+const { test } = require('node:test');
+
+test('eval typescript esm syntax', async () => {
+  const result = await spawnPromisified(process.execPath, [
+    '--input-type=module',
+    '--experimental-strip-types',
+    '--eval',
+    `import util from 'node:util'
+    const text: string = 'Hello, TypeScript!'
+    console.log(util.styleText('red', text));`]);
+
+  strictEqual(result.stderr, '');
+  match(result.stdout, /Hello, TypeScript!/);
+  strictEqual(result.code, 0);
+});
+
+test('eval typescript cjs syntax', async () => {
+  const result = await spawnPromisified(process.execPath, [
+    '--input-type=commonjs',
+    '--experimental-strip-types',
+    '--eval',
+    `const util = require('node:util');
+    const text: string = 'Hello, TypeScript!'
+    console.log(util.styleText('red', text));`]);
+  match(result.stdout, /Hello, TypeScript!/);
+  strictEqual(result.stderr, '');
+  strictEqual(result.code, 0);
+});
+
+test('eval typescript cjs syntax by default', async () => {
+  const result = await spawnPromisified(process.execPath, [
+    '--experimental-strip-types',
+    '--eval',
+    `const util = require('node:util');
+    const text: string = 'Hello, TypeScript!'
+    console.log(util.styleText('red', text));`]);
+
+  strictEqual(result.stderr, '');
+  match(result.stdout, /Hello, TypeScript!/);
+  strictEqual(result.code, 0);
+});
+
+test('fail typescript esm syntax if not specified', async () => {
+  const result = await spawnPromisified(process.execPath, [
+    '--experimental-strip-types',
+    '--eval',
+    `import util from 'node:util'
+    const text: string = 'Hello, TypeScript!'
+    console.log(util.styleText('red', text));`]);
+  strictEqual(result.stdout, '');
+  match(result.stderr, /Cannot use import statement outside a module/);
+  strictEqual(result.code, 1);
+});
+
+test('expect fail eval typescript cjs syntax with input-type module', async () => {
+  const result = await spawnPromisified(process.execPath, [
+    '--experimental-strip-types',
+    '--input-type=module',
+    '--eval',
+    `const util = require('node:util');
+    const text: string = 'Hello, TypeScript!'
+    console.log(util.styleText('red', text));`]);
+
+  strictEqual(result.stdout, '');
+  match(result.stderr, /require is not defined in ES module scope, you can use import instead/);
+  strictEqual(result.code, 1);
+});
+
+test('expect fail eval typescript cjs syntax with input-type module', async () => {
+  const result = await spawnPromisified(process.execPath, [
+    '--experimental-strip-types',
+    '--input-type=commonjs',
+    '--eval',
+    `import util from 'node:util'
+    const text: string = 'Hello, TypeScript!'
+    console.log(util.styleText('red', text));`]);
+  strictEqual(result.stdout, '');
+  match(result.stderr, /Cannot use import statement outside a module/);
+  strictEqual(result.code, 1);
+});

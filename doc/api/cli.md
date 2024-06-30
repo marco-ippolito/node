@@ -1049,6 +1049,16 @@ added:
 
 Use this flag to enable [ShadowRealm][] support.
 
+### `--experimental-strip-types`
+
+<!-- YAML
+added: REPLACEME
+-->
+
+> Stability: 1.0 - Early development
+
+Enable experimental type-stripping for typescript files.
+
 ### `--experimental-test-coverage`
 
 <!-- YAML
@@ -2852,6 +2862,7 @@ one is included in the list below.
 * `--experimental-require-module`
 * `--experimental-shadow-realm`
 * `--experimental-specifier-resolution`
+* `--experimental-strip-types`
 * `--experimental-top-level-await`
 * `--experimental-vm-modules`
 * `--experimental-wasi-unstable-preview1`

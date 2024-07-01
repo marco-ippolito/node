@@ -1,5 +1,5 @@
 {
-  "name": "@swc/wasm-web",
+  "name": "@swc/wasm",
   "collaborators": [
     "강동윤 <kdy1997.dev@gmail.com>"
   ],
@@ -11,13 +11,10 @@
     "url": "https://github.com/swc-project/swc.git"
   },
   "files": [
-    "wasm-web_bg.wasm",
-    "wasm-web.js",
-    "wasm-web.d.ts"
+    "wasm_bg.wasm",
+    "wasm.js",
+    "wasm.d.ts"
   ],
-  "module": "wasm-web.js",
-  "types": "wasm-web.d.ts",
-  "sideEffects": [
-    "./snippets/*"
-  ]
+  "main": "wasm.js",
+  "types": "wasm.d.ts"
 }

@@ -30,6 +30,7 @@ This a list of all the dependencies:
 * [simdjson][]
 * [simdutf][]
 * [sqlite][]
+* [swc/wasm][]
 * [undici][]
 * [uvwasi][]
 * [V8][]
@@ -296,6 +297,11 @@ a C++ library for fast UTF-8 decoding and encoding.
 The [sqlite](https://github.com/sqlite/sqlite) dependency is
 an embedded SQL database engine written in C.
 
+### swc/wasm
+
+The [swc/wasm](https://swc.rs/docs/usage/wasm) dependency is a
+WebAssembly version of the SWC JavaScript/TypeScript parser.
+
 ### undici
 
 The [undici](https://github.com/nodejs/undici) dependency is an HTTP/1.1 client,
@@ -352,6 +358,7 @@ performance improvements not currently available in standard zlib.
 [simdjson]: #simdjson
 [simdutf]: #simdutf
 [sqlite]: #sqlite
+[swc/wasm]: #swc/wasm
 [undici]: #undici
 [update-openssl-action]: ../../../.github/workflows/update-openssl.yml
 [uvwasi]: #uvwasi

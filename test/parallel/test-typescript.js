@@ -18,3 +18,18 @@ test('execute a typescript file', async () => {
   strictEqual(stderr, '');
   strictEqual(stdout, 'Hello, TypeScript!\n');
 });
+
+test('execute a typescript file with imports', async () => {
+  const {
+    code,
+    stderr,
+    stdout,
+  } = await spawnPromisified(process.execPath, [
+    '--experimental-typescript',
+    fixtures.path('typescript/b.ts'),
+  ], { stdio: ['inherit'] });
+
+  strictEqual(code, 0);
+  strictEqual(stderr, '');
+  strictEqual(stdout, 'foo\n');
+});

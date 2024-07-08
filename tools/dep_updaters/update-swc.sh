@@ -12,7 +12,6 @@ BASE_DIR=$(cd "$(dirname "$0")/../.." && pwd)
 [ -x "$NODE" ] || NODE=$(command -v node)
 DEPS_DIR="$BASE_DIR/deps"
 NPM="$DEPS_DIR/npm/bin/npm-cli.js"
-TOOLS_DIR="$BASE_DIR/tools"
 
 # shellcheck disable=SC1091
 . "$BASE_DIR/tools/dep_updaters/utils.sh"
@@ -64,7 +63,15 @@ curl -sL -o "LICENSE" "https://raw.githubusercontent.com/swc-project/swc/HEAD/LI
 
 mv "LICENSE" "$DEPS_DIR/swc/LICENSE"
 
-rm "$DEPS_DIR/swc/wasm_bg.wasm"
+# update version information in src/undici_version.h
+cat > "$ROOT/src/swc_version.h" <<EOF
+// This is an auto generated file, please do not edit.
+// Refer to tools/dep_updaters/update-swc.sh
+#ifndef SRC_SWC_VERSION_H_
+#define SRC_SWC_VERSION_H_
+#define SWC_VERSION "$NEW_VERSION"
+#endif  // SRC_SWC_VERSION_H_
+EOF
 
 echo "All done!"
 echo ""

@@ -1056,44 +1056,50 @@ added: REPLACEME
 
 > Stability: 1.0 - Early development
 
-It is possible to execute TypeScript files by setting the experimental
-flag [`--experimental-strip-types`][].
-Node.js will replace inline TypeScript types with whitespace.
-No type checking is performed, and types are discarded.
-TypeScript features that cannot be replaced by whitespace, such as enums, will error.
-As in JavaScript files, file extensions are required in `import` statements
-and `import()` expressions.
-TypeScript features that depend on settings within `tsconfig.json`,
-such as paths or converting module formats, are unsupported.
+The flag [`--experimental-strip-types`][] enables Node.js to run TypeScript
+files that contain only type annotations. Such files contain no TypeScript
+features that require transformation, such as enums or namespaces. Node.js will
+replace inline type annotations with whitespace, and no type checking is
+performed. TypeScript features that depend on settings within `tsconfig.json`,
+such as paths or converting newer JavaScript syntax to older standards, are
+intentionally unsupported.
 
-> The flag [`--experimental-require-module`][] is currently not supported.
+To get fuller TypeScript support, including support for enums and namespaces
+and paths, see <https://nodejs.org/en/learn/getting-started/nodejs-with-typescript>.
+The built-in TypeScript support is designed to be lightweight and as fast as
+possible. By intentionally not supporting syntaxes that require JavaScript code
+generation, and by replacing stripped types with whitespace, Node.js can run
+TypeScript code without the need for source maps and with less overhead.
 
-### Limitations
+> `require` calls of ES modules (the [`--experimental-require-module`][] flag)
+> are not yet supported from TypeScript code.
 
-#### Determining module system
+### Determining module system
 
-Node.js supports both [CommonJS][] and [ES Modules][] TypeScript syntax.
-When executing TypeScript files, Node.js will not transpile the module system.
-Since all that Node.js is doing is removing inline types, any `import`, `require`,
-`export` or `module.exports` statements, will be run as written.
+Node.js supports both [CommonJS][] and [ES Modules][] syntax in TypeScript
+files. Node.js will not convert from one module system to another; if you want
+your code to run as an ES module, you must use `import` and `export` syntax,
+and if you want your code to run as CommonJS you must use `require` and
+`module.exports`.
 
-* `.ts` files will by default be as CommonJS modules,
-  unless specified otherwise, similarly to `.js` files.
-* `.mts` and `.cts` files will be treated as `.mjs` and `.cjs` files respectively.
-* `.tsx` files are not supported.
+* `.ts` files will have their module system determined
+  [the same way as `.js` files.][] To use `import` and `export` syntax, add
+  `"type": "module"` to the nearest parent `package.json`.
+* `.mts` files will always be run as ES modules, similar to `.mjs` files.
+* `.cts` files will always be run as CommonJS modules, similar to `.cjs` files.
+* `.tsx` files are unsupported.
 
-Importing [modules without extension][] is not supported,
-file extensions are **always** required:
+As in JavaScript files, [file extensions are mandatory][] in `import` statements
+and `import()` expressions: `import './file.ts'`, not `import './file'`.
+Because of backward compatibility, file extensions are also mandatory in
+`require()` calls: `require('./file.ts')`, not `require('./file')`, similar to
+how the `.cjs` extension is mandatory in `require` calls in CommonJS files.
 
-```ts
-  import { foo } from './foo'; // it will not work
-  import { foo } from './foo.ts'; // it will work
-```
+The `tsconfig.json` option `allowImportingTsExtensions` will allow the
+TypeScript compiler `tsc` to type-check files with `import` specifiers that
+include the `.ts` extension.
 
-The `tsconfig.json` option
-`allowImportingTsExtensions` may help provide compatibility with other tools.
-
-#### TypeScript only features
+### Unsupported TypeScript features
 
 Since Node.js is only removing inline types, any TypeScript features that
 involve _replacing_ TypeScript syntax with new JavaScript syntax will error.
@@ -1106,14 +1112,24 @@ The most prominent unsupported features that require transformation are:
 * `experimentalDecorators`
 * `namespaces`
 
-#### REPL
+In addition, Node.js does not read `tsconfig.json` files and does not support
+features that depend on settings within `tsconfig.json`, such as paths or
+converting newer JavaScript syntax into older standards.
 
-Executing source code in the REPL with TypeScript is not supported.
-This also applies to `--print`, `--check` and `inspect`.
+### Non-file forms of input
 
-#### Source maps
+Type stripping can be enabled for `--eval` and STDIN input. The module system
+will be determined by `--input-type`, as it is for JavaScript.
 
-Currently source maps are not supported.
+TypeScript syntax is unsupported in the REPL, `--print`, `--check`, and
+`inspect`.
+
+### Source maps
+
+Since inline types are replaced by whitespace, source maps are unnecessary for
+correct line numbers in stack traces; and Node.js does not generate them. For
+source maps support, see
+<https://nodejs.org/en/learn/getting-started/nodejs-with-typescript#running-typescript-code-in-nodejs>
 
 [CommonJS]: modules.md
 [Conditional exports]: packages.md#conditional-exports
@@ -1137,10 +1153,11 @@ Currently source maps are not supported.
 [`string`]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String
 [`util.TextDecoder`]: util.md#class-utiltextdecoder
 [chain]: #chaining
+[file extensions are mandatory]: esm.md#mandatory-file-extensions
 [hooks]: #customization-hooks
 [load hook]: #loadurl-context-nextload
 [module wrapper]: modules.md#the-module-wrapper
-[modules without extension]: esm.md#mandatory-file-extensions
 [realm]: https://tc39.es/ecma262/#realm
 [source map include directives]: https://sourcemaps.info/spec.html#h.lmz475t4mvbx
+[the same way as `.js` files.]: packages.md#determining-module-system
 [transferrable objects]: worker_threads.md#portpostmessagevalue-transferlist

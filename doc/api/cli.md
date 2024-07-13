@@ -877,7 +877,8 @@ On Windows, using `cmd.exe` a single quote will not work correctly because it
 only recognizes double `"` for quoting. In Powershell or Git bash, both `'`
 and `"` are usable.
 
-It is possible to execute TypeScript code using [`--experimental-strip-types`][].
+It is possible to run code containing inline types by passing
+[`--experimental-strip-types`][].
 
 ### `--experimental-default-type=type`
 

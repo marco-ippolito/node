@@ -3,7 +3,7 @@ import * as fixtures from '../common/fixtures.mjs';
 import { match, strictEqual } from 'node:assert';
 import { test } from 'node:test';
 
-test('expect failure of a mts file with commonjs syntax', async () => {
+test('expect failure of a .mts file with CommonJS syntax', async () => {
   const result = await spawnPromisified(process.execPath, [
     '--experimental-strip-types',
     fixtures.path('typescript/mts/test-mts-but-commonjs-syntax.mts'),
@@ -14,7 +14,7 @@ test('expect failure of a mts file with commonjs syntax', async () => {
   strictEqual(result.code, 1);
 });
 
-test('execute of a mts file import mts module', async () => {
+test('execute an .mts file importing an .mts file', async () => {
   const result = await spawnPromisified(process.execPath, [
     '--experimental-strip-types',
     fixtures.path('typescript/mts/test-import-module.mts'),
@@ -25,7 +25,7 @@ test('execute of a mts file import mts module', async () => {
   strictEqual(result.code, 0);
 });
 
-test('execute a mts file importing ts module', async () => {
+test('execute an .mts file importing a .ts file', async () => {
   const result = await spawnPromisified(process.execPath, [
     '--experimental-strip-types',
     '--experimental-default-type=module', // this should fail
@@ -37,7 +37,7 @@ test('execute a mts file importing ts module', async () => {
   strictEqual(result.code, 0);
 });
 
-test('execute a mts file importing cts module', async () => {
+test('execute an .mts file importing a .cts file', async () => {
   const result = await spawnPromisified(process.execPath, [
     '--experimental-strip-types',
     fixtures.path('typescript/mts/test-import-commonjs.mts'),
@@ -48,7 +48,7 @@ test('execute a mts file importing cts module', async () => {
   strictEqual(result.code, 0);
 });
 
-test('execute of a mts file with wrong default module', async () => {
+test('execute an .mts file with wrong default module', async () => {
   const result = await spawnPromisified(process.execPath, [
     '--experimental-strip-types',
     '--experimental-default-type=commonjs',
@@ -60,7 +60,7 @@ test('execute of a mts file with wrong default module', async () => {
   strictEqual(result.code, 1);
 });
 
-test('execute of a mts file from node_modules', async () => {
+test('execute an .mts file from node_modules', async () => {
   const result = await spawnPromisified(process.execPath, [
     '--experimental-strip-types',
     fixtures.path('typescript/mts/test-mts-node_modules.mts'),
@@ -71,7 +71,7 @@ test('execute of a mts file from node_modules', async () => {
   strictEqual(result.code, 0);
 });
 
-test('execute of a cts file from node_modules', async () => {
+test('execute a .cts file from node_modules', async () => {
   const result = await spawnPromisified(process.execPath, [
     '--experimental-strip-types',
     fixtures.path('typescript/mts/test-cts-node_modules.mts'),
@@ -82,7 +82,7 @@ test('execute of a cts file from node_modules', async () => {
   strictEqual(result.code, 0);
 });
 
-test('execute of a ts file from node_modules', async () => {
+test('execute a .ts file from node_modules', async () => {
   const result = await spawnPromisified(process.execPath, [
     '--experimental-strip-types',
     fixtures.path('typescript/mts/test-ts-node_modules.mts'),

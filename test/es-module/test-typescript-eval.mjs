@@ -2,7 +2,7 @@ import { spawnPromisified } from '../common/index.mjs';
 import { match, strictEqual } from 'node:assert';
 import { test } from 'node:test';
 
-test('eval typescript esm syntax', async () => {
+test('eval TypeScript ESM syntax', async () => {
   const result = await spawnPromisified(process.execPath, [
     '--input-type=module',
     '--experimental-strip-types',
@@ -16,7 +16,7 @@ test('eval typescript esm syntax', async () => {
   strictEqual(result.code, 0);
 });
 
-test('eval typescript cjs syntax', async () => {
+test('eval TypeScript CommonJS syntax', async () => {
   const result = await spawnPromisified(process.execPath, [
     '--input-type=commonjs',
     '--experimental-strip-types',
@@ -29,7 +29,7 @@ test('eval typescript cjs syntax', async () => {
   strictEqual(result.code, 0);
 });
 
-test('eval typescript cjs syntax by default', async () => {
+test('eval TypeScript CommonJS syntax by default', async () => {
   const result = await spawnPromisified(process.execPath, [
     '--experimental-strip-types',
     '--eval',
@@ -42,7 +42,7 @@ test('eval typescript cjs syntax by default', async () => {
   strictEqual(result.code, 0);
 });
 
-test('fail typescript esm syntax if not specified', async () => {
+test('fail TypeScript ESM syntax if not specified', async () => {
   const result = await spawnPromisified(process.execPath, [
     '--experimental-strip-types',
     '--eval',
@@ -54,7 +54,7 @@ test('fail typescript esm syntax if not specified', async () => {
   strictEqual(result.code, 1);
 });
 
-test('expect fail eval typescript cjs syntax with input-type module', async () => {
+test('expect fail eval TypeScript CommonJS syntax with input-type module', async () => {
   const result = await spawnPromisified(process.execPath, [
     '--experimental-strip-types',
     '--input-type=module',
@@ -68,7 +68,7 @@ test('expect fail eval typescript cjs syntax with input-type module', async () =
   strictEqual(result.code, 1);
 });
 
-test('expect fail eval typescript cjs syntax with input-type module', async () => {
+test('expect fail eval TypeScript CommonJS syntax with input-type module', async () => {
   const result = await spawnPromisified(process.execPath, [
     '--experimental-strip-types',
     '--input-type=commonjs',

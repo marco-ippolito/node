@@ -3,7 +3,7 @@ import * as fixtures from '../common/fixtures.mjs';
 import { match, strictEqual } from 'node:assert';
 import { test } from 'node:test';
 
-test('expect failure of a mts file with commonjs syntax', async () => {
+test('expect failure of an .mts file with CommonJS syntax', async () => {
   const result = await spawnPromisified(process.execPath, [
     '--experimental-strip-types',
     fixtures.path('typescript/cts/test-cts-but-module-syntax.cts'),
@@ -14,7 +14,7 @@ test('expect failure of a mts file with commonjs syntax', async () => {
   strictEqual(result.code, 1);
 });
 
-test('execute of a cts file import cts module', async () => {
+test('execute a .cts file importing a .cts file', async () => {
   const result = await spawnPromisified(process.execPath, [
     '--experimental-strip-types',
     fixtures.path('typescript/cts/test-require-commonjs.cts'),
@@ -25,7 +25,7 @@ test('execute of a cts file import cts module', async () => {
   strictEqual(result.code, 0);
 });
 
-test('execute a cts file importing ts export', async () => {
+test('execute a .cts file importing a .ts file export', async () => {
   const result = await spawnPromisified(process.execPath, [
     '--experimental-strip-types',
     fixtures.path('typescript/cts/test-require-ts-file.cts'),
@@ -36,7 +36,7 @@ test('execute a cts file importing ts export', async () => {
   strictEqual(result.code, 0);
 });
 
-test('execute a cts file importing mts export', async () => {
+test('execute a .cts file importing a .mts file export', async () => {
   const result = await spawnPromisified(process.execPath, [
     '--experimental-strip-types',
     fixtures.path('typescript/cts/test-require-mts-module.cts'),
@@ -47,7 +47,7 @@ test('execute a cts file importing mts export', async () => {
   strictEqual(result.code, 1);
 });
 
-test('execute a cts file importing mts export', async () => {
+test('execute a .cts file importing a .mts file export', async () => {
   const result = await spawnPromisified(process.execPath, [
     '--experimental-strip-types',
     '--experimental-require-module',
@@ -59,7 +59,7 @@ test('execute a cts file importing mts export', async () => {
   strictEqual(result.code, 0);
 });
 
-test('expect failure of a cts with default type module', async () => {
+test('expect failure of a .cts file with default type module', async () => {
   const result = await spawnPromisified(process.execPath, [
     '--experimental-strip-types',
     '--experimental-default-type=module', // Keeps working with commonjs
@@ -71,7 +71,7 @@ test('expect failure of a cts with default type module', async () => {
   strictEqual(result.code, 0);
 });
 
-test('expect failure of a cts with default type module', async () => {
+test('expect failure of a .cts file with default type module', async () => {
   const result = await spawnPromisified(process.execPath, [
     '--experimental-strip-types',
     fixtures.path('typescript/cts/test-cts-node_modules.cts'),
@@ -82,7 +82,7 @@ test('expect failure of a cts with default type module', async () => {
   strictEqual(result.code, 0);
 });
 
-test('expect failure of a cts with default type module', async () => {
+test('expect failure of a .cts file with default type module', async () => {
   const result = await spawnPromisified(process.execPath, [
     '--experimental-strip-types',
     fixtures.path('typescript/cts/test-ts-node_modules.cts'),
@@ -93,7 +93,7 @@ test('expect failure of a cts with default type module', async () => {
   strictEqual(result.code, 0);
 });
 
-test('expect failure of a cts with default type module', async () => {
+test('expect failure of a .cts file with default type module', async () => {
   const result = await spawnPromisified(process.execPath, [
     '--experimental-strip-types',
     fixtures.path('typescript/cts/test-mts-node_modules.cts'),
@@ -104,7 +104,7 @@ test('expect failure of a cts with default type module', async () => {
   strictEqual(result.code, 1);
 });
 
-test('expect failure of a cts with default type module', async () => {
+test('expect failure of a .cts file with default type module', async () => {
   const result = await spawnPromisified(process.execPath, [
     '--experimental-strip-types',
     '--experimental-require-module',

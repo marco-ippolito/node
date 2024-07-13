@@ -3,7 +3,7 @@ import * as fixtures from '../common/fixtures.mjs';
 import { match, strictEqual } from 'node:assert';
 import { test } from 'node:test';
 
-test('execute a typescript file', async () => {
+test('execute a TypeScript file', async () => {
   const result = await spawnPromisified(process.execPath, [
     '--experimental-strip-types',
     fixtures.path('typescript/ts/test-typescript.ts'),
@@ -14,7 +14,7 @@ test('execute a typescript file', async () => {
   strictEqual(result.code, 0);
 });
 
-test('execute a typescript file with imports', async () => {
+test('execute a TypeScript file with imports', async () => {
   const result = await spawnPromisified(process.execPath, [
     '--experimental-strip-types',
     '--experimental-default-type=module',
@@ -26,7 +26,7 @@ test('execute a typescript file with imports', async () => {
   strictEqual(result.code, 0);
 });
 
-test('execute a typescript with node_modules', async () => {
+test('execute a TypeScript file with node_modules', async () => {
   const result = await spawnPromisified(process.execPath, [
     '--experimental-strip-types',
     '--experimental-default-type=module',
@@ -38,7 +38,7 @@ test('execute a typescript with node_modules', async () => {
   strictEqual(result.code, 0);
 });
 
-test('expect error when executing a typescript file with imports with no extensions', async () => {
+test('expect error when executing a TypeScript file with imports with no extensions', async () => {
   const result = await spawnPromisified(process.execPath, [
     '--experimental-strip-types',
     '--experimental-default-type=module',
@@ -50,7 +50,7 @@ test('expect error when executing a typescript file with imports with no extensi
   strictEqual(result.code, 1);
 });
 
-test('expect error when executing a typescript file with enum', async () => {
+test('expect error when executing a TypeScript file with enum', async () => {
   const result = await spawnPromisified(process.execPath, [
     '--experimental-strip-types',
     fixtures.path('typescript/ts/test-enums.ts'),
@@ -62,7 +62,7 @@ test('expect error when executing a typescript file with enum', async () => {
   strictEqual(result.code, 1);
 });
 
-test('expect error when executing a typescript file with experimental decorators', async () => {
+test('expect error when executing a TypeScript file with experimental decorators', async () => {
   const result = await spawnPromisified(process.execPath, [
     '--experimental-strip-types',
     fixtures.path('typescript/ts/test-experimental-decorators.ts'),
@@ -73,7 +73,7 @@ test('expect error when executing a typescript file with experimental decorators
   strictEqual(result.code, 1);
 });
 
-test('expect error when executing a typescript file with namespaces', async () => {
+test('expect error when executing a TypeScript file with namespaces', async () => {
   const result = await spawnPromisified(process.execPath, [
     '--experimental-strip-types',
     fixtures.path('typescript/ts/test-namespaces.ts'),
@@ -84,7 +84,7 @@ test('expect error when executing a typescript file with namespaces', async () =
   strictEqual(result.code, 1);
 });
 
-test('execute a typescript file with type definition', async () => {
+test('execute a TypeScript file with type definition', async () => {
   const result = await spawnPromisified(process.execPath, [
     '--experimental-strip-types',
     fixtures.path('typescript/ts/test-import-types.ts'),
@@ -95,7 +95,7 @@ test('execute a typescript file with type definition', async () => {
   strictEqual(result.code, 0);
 });
 
-test('execute a typescript file with commonjs syntax', async () => {
+test('execute a TypeScript file with CommonJS syntax', async () => {
   const result = await spawnPromisified(process.execPath, [
     '--experimental-strip-types',
     fixtures.path('typescript/ts/test-commonjs-parsing.ts'),
@@ -105,7 +105,7 @@ test('execute a typescript file with commonjs syntax', async () => {
   strictEqual(result.code, 0);
 });
 
-test('execute a ts file with module syntax', async () => {
+test('execute a TypeScript file with ES module syntax', async () => {
   const result = await spawnPromisified(process.execPath, [
     '--experimental-strip-types',
     '--experimental-default-type=module',
@@ -117,7 +117,7 @@ test('execute a ts file with module syntax', async () => {
   strictEqual(result.code, 0);
 });
 
-test('expect failure of a ts file requiring esm syntax', async () => {
+test('expect failure of a TypeScript file requiring ES module syntax', async () => {
   const result = await spawnPromisified(process.execPath, [
     '--experimental-strip-types',
     '--experimental-require-module',
@@ -129,7 +129,7 @@ test('expect failure of a ts file requiring esm syntax', async () => {
   strictEqual(result.code, 0);
 });
 
-test('expect stacktrace of a ts file to be corrct', async () => {
+test('expect stack trace of a TypeScript file to be correct', async () => {
   const result = await spawnPromisified(process.execPath, [
     '--experimental-strip-types',
     fixtures.path('typescript/ts/test-whitespacing.ts'),
@@ -140,7 +140,7 @@ test('expect stacktrace of a ts file to be corrct', async () => {
   strictEqual(result.code, 1);
 });
 
-test('execute commonjs ts file from node_modules with require module', async () => {
+test('execute CommonJS TypeScript file from node_modules with require-module', async () => {
   const result = await spawnPromisified(process.execPath, [
     '--experimental-default-type=module',
     '--experimental-strip-types',
@@ -152,7 +152,7 @@ test('execute commonjs ts file from node_modules with require module', async () 
   strictEqual(result.code, 0);
 });
 
-test('execute a typescript file with commonjs syntax but default type module', async () => {
+test('execute a TypeScript file with CommonJS syntax but default type module', async () => {
   const result = await spawnPromisified(process.execPath, [
     '--experimental-strip-types',
     '--experimental-default-type=module',
@@ -163,7 +163,7 @@ test('execute a typescript file with commonjs syntax but default type module', a
   strictEqual(result.code, 1);
 });
 
-test('execute a typescript file with commonjs syntax requiring cts', async () => {
+test('execute a TypeScript file with CommonJS syntax requiring .cts', async () => {
   const result = await spawnPromisified(process.execPath, [
     '--experimental-strip-types',
     fixtures.path('typescript/ts/test-require-cts.ts'),
@@ -174,7 +174,7 @@ test('execute a typescript file with commonjs syntax requiring cts', async () =>
   strictEqual(result.code, 0);
 });
 
-test('execute a typescript file with commonjs syntax requiring mts', async () => {
+test('execute a TypeScript file with CommonJS syntax requiring .mts', async () => {
   const result = await spawnPromisified(process.execPath, [
     '--experimental-strip-types',
     fixtures.path('typescript/ts/test-require-mts.ts'),
@@ -185,7 +185,7 @@ test('execute a typescript file with commonjs syntax requiring mts', async () =>
   strictEqual(result.code, 1);
 });
 
-test('execute a typescript file with commonjs syntax requiring mts with require module', async () => {
+test('execute a TypeScript file with CommonJS syntax requiring .mts with require-module', async () => {
   const result = await spawnPromisified(process.execPath, [
     '--experimental-strip-types',
     '--experimental-require-module',
@@ -197,7 +197,7 @@ test('execute a typescript file with commonjs syntax requiring mts with require 
   strictEqual(result.code, 0);
 });
 
-test('execute a typescript file with commonjs syntax requiring mts with require module', async () => {
+test('execute a TypeScript file with CommonJS syntax requiring .mts with require-module', async () => {
   const result = await spawnPromisified(process.execPath, [
     '--experimental-strip-types',
     '--experimental-default-type=commonjs',

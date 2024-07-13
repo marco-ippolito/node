@@ -3,6 +3,34 @@ import * as fixtures from '../common/fixtures.mjs';
 import { match, strictEqual } from 'node:assert';
 import { test } from 'node:test';
 
+test('require a .ts file with explicit extension succeeds', async () => {
+  const result = await spawnPromisified(process.execPath, [
+    '--experimental-strip-types',
+    '--eval',
+    'require("./test-typescript.ts")',
+  ], {
+    cwd: fixtures.path('typescript/ts'),
+  });
+
+  strictEqual(result.stderr, '');
+  strictEqual(result.stdout, 'Hello, TypeScript!\n');
+  strictEqual(result.code, 0);
+});
+
+test('require a .ts file with implicit extension fails', async () => {
+  const result = await spawnPromisified(process.execPath, [
+    '--experimental-strip-types',
+    '--eval',
+    'require("./test-typescript")',
+  ], {
+    cwd: fixtures.path('typescript/ts'),
+  });
+
+  match(result.stderr, /ENOENT.*Did you mean to import .*test-typescript\.ts"\?/s);
+  strictEqual(result.stdout, '');
+  strictEqual(result.code, 1);
+});
+
 test('expect failure of an .mts file with CommonJS syntax', async () => {
   const result = await spawnPromisified(process.execPath, [
     '--experimental-strip-types',

@@ -1,7 +1,7 @@
-'use strict';
-const { spawnPromisified } = require('../common');
-const { match, strictEqual } = require('node:assert');
-const { test } = require('node:test');
+import { spawnPromisified } from '../common/index.mjs';
+import { match, strictEqual } from 'node:assert';
+import { test } from 'node:test';
+
 
 test('eval typescript esm syntax', async () => {
   const result = await spawnPromisified(process.execPath, [

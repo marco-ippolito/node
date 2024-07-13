@@ -1,8 +1,8 @@
-'use strict';
-const { spawnPromisified } = require('../common');
-const fixtures = require('../common/fixtures');
-const { match, strictEqual } = require('node:assert');
-const { test } = require('node:test');
+import { spawnPromisified } from '../common/index.mjs';
+import * as fixtures from '../common/fixtures.mjs';
+import { match, strictEqual } from 'node:assert';
+import { test } from 'node:test';
+
 
 test('execute a typescript file', async () => {
   const result = await spawnPromisified(process.execPath, [

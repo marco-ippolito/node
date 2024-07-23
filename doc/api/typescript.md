@@ -61,22 +61,22 @@ TypeScript code without the need for source maps and with less overhead.
 
 Node.js supports both [CommonJS][] and [ES Modules][] syntax in TypeScript
 files. Node.js will not convert from one module system to another; if you want
-your code to run as an ES module, you must use `import` and `export` syntax,
-and if you want your code to run as CommonJS you must use `require` and
+your code to run as an ES module, you must use `import` and `export` syntax, and
+if you want your code to run as CommonJS you must use `require` and
 `module.exports`.
 
-* `.ts` files will have their module system determined
-  [the same way as `.js` files.][] To use `import` and `export` syntax, add
-  `"type": "module"` to the nearest parent `package.json`.
+* `.ts` files will have their module system determined [the same way as `.js`
+  files.][] To use `import` and `export` syntax, add `"type": "module"` to the
+  nearest parent `package.json`.
 * `.mts` files will always be run as ES modules, similar to `.mjs` files.
 * `.cts` files will always be run as CommonJS modules, similar to `.cjs` files.
 * `.tsx` files are unsupported.
 
 As in JavaScript files, [file extensions are mandatory][] in `import` statements
-and `import()` expressions: `import './file.ts'`, not `import './file'`.
-Because of backward compatibility, file extensions are also mandatory in
-`require()` calls: `require('./file.ts')`, not `require('./file')`, similar to
-how the `.cjs` extension is mandatory in `require` calls in CommonJS files.
+and `import()` expressions: `import './file.ts'`, not `import './file'`. Because
+of backward compatibility, file extensions are also mandatory in `require()`
+calls: `require('./file.ts')`, not `require('./file')`, similar to how the
+`.cjs` extension is mandatory in `require` calls in CommonJS files.
 
 The `tsconfig.json` option `allowImportingTsExtensions` will allow the
 TypeScript compiler `tsc` to type-check files with `import` specifiers that
@@ -103,10 +103,9 @@ converting newer JavaScript syntax into older standards.
 ### Importing types without `type` keyword
 
 Due to the nature of type stripping, the `type` keyword is necessary to
-correctly strip type imports.
-Without the `type` keyword, Node.js will treat the import as a value import,
-which will result in a runtime error.
-The tsconfig option [`verbatimModuleSyntax`][] can be used to match this behavior.
+correctly strip type imports. Without the `type` keyword, Node.js will treat the
+import as a value import, which will result in a runtime error. The tsconfig
+option [`verbatimModuleSyntax`][] can be used to match this behavior.
 
 This example will work correctly:
 

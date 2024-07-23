@@ -122,14 +122,6 @@ import { Type1, Type2 } from './module.ts';
 import { fn, FnParams } from './fn.ts';
 ```
 
-### Type stripping in `node_modules` directories
-
-To avoid encouraging package authors to publish TypeScript only modules,
-Node.js will by default refuse to handle TypeScript files inside `node_modules` directories.
-When attempting to resolve a `.ts`, `.cts`, or `.mts` file that is a children of a
-`node_modules` directory, `defaultResolve` will throw
-a [`ERR_UNSUPPORTED_NODE_MODULES_TYPE_STRIPPING`][] error.
-
 ### Non-file forms of input
 
 Type stripping can be enabled for `--eval` and STDIN input. The module system
@@ -143,6 +135,12 @@ TypeScript syntax is unsupported in the REPL, `--print`, `--check`, and
 Since inline types are replaced by whitespace, source maps are unnecessary for
 correct line numbers in stack traces; and Node.js does not generate them. For
 source maps support, see [Full TypeScript support][].
+
+### Type stripping in dependencies
+
+To discourage package authors from publishing packages written in TypeScript,
+Node.js will by default refuse to handle TypeScript files inside folders under
+a `node_modules` path.
 
 [CommonJS]: modules.md
 [ES Modules]: esm.md

@@ -1,6 +1,41 @@
 # Modules: TypeScript
 
-<!--lint disable prohibited-strings-->
+## Enabling
+
+There are two ways to enable runtime TypeScript support in Node.js:
+
+1. For [full support][] of all of TypeScript's syntax and features, including
+   using any version of TypeScript, use a third-party package.
+
+2. For lightweight support, you can use the built-in support for
+   [type stripping][].
+
+## Full TypeScript support
+
+To use TypeScript with full support for all TypeScript features, including
+`tsconfig.json`, you can use a third-party package. These instructions use
+[`tsx`][] as an example but there are many other similar libraries available.
+
+1. Install the package as a development dependency using whatever package
+   manager you're using for your project. For example, with `npm`:
+
+   ```bash
+   npm install --save-dev tsx
+   ```
+
+2. Then you can run your TypeScript code via:
+
+   ```bash
+   npx tsx your-file.ts
+   ```
+
+   Or alternatively, you can run with `node` via:
+
+   ```bash
+   node --import=tsx your-file.ts
+   ```
+
+## Type stripping
 
 <!-- YAML
 added: REPLACEME
@@ -14,13 +49,12 @@ features that require transformation, such as enums or namespaces. Node.js will
 replace inline type annotations with whitespace, and no type checking is
 performed. TypeScript features that depend on settings within `tsconfig.json`,
 such as paths or converting newer JavaScript syntax to older standards, are
-intentionally unsupported.
+intentionally unsupported. To get fuller TypeScript support, including support
+for enums and namespaces and paths, see [Full TypeScript support][].
 
-To get fuller TypeScript support, including support for enums and namespaces
-and paths, see <https://nodejs.org/en/learn/getting-started/nodejs-with-typescript>.
-The built-in TypeScript support is designed to be lightweight and as fast as
+The type stripping feature is designed to be lightweight and as fast as
 possible. By intentionally not supporting syntaxes that require JavaScript code
-generation, and by replacing stripped types with whitespace, Node.js can run
+generation, and by replacing inline types with whitespace, Node.js can run
 TypeScript code without the need for source maps and with less overhead.
 
 ### Determining module system
@@ -53,7 +87,7 @@ include the `.ts` extension.
 Since Node.js is only removing inline types, any TypeScript features that
 involve _replacing_ TypeScript syntax with new JavaScript syntax will error.
 This is by design. To run TypeScript with such features, see
-<https://nodejs.org/en/learn/getting-started/nodejs-with-typescript#running-typescript-code-in-nodejs>
+[Full TypeScript support][].
 
 The most prominent unsupported features that require transformation are:
 
@@ -108,15 +142,16 @@ TypeScript syntax is unsupported in the REPL, `--print`, `--check`, and
 
 Since inline types are replaced by whitespace, source maps are unnecessary for
 correct line numbers in stack traces; and Node.js does not generate them. For
-source maps support, see
-<https://nodejs.org/en/learn/getting-started/nodejs-with-typescript#running-typescript-code-in-nodejs>
-
-<!--lint enable prohibited-strings-->
+source maps support, see [Full TypeScript support][].
 
 [CommonJS]: modules.md
 [ES Modules]: esm.md
+[Full TypeScript support]: #full-typescript-support
 [`--experimental-strip-types`]: cli.md#--experimental-strip-types
 [`ERR_UNSUPPORTED_NODE_MODULES_TYPE_STRIPPING`]: errors.md#err_unsupported_node_modules_type_stripping
+[`tsx`]: https://tsx.is/
 [`verbatimModuleSyntax`]: https://www.typescriptlang.org/tsconfig/#verbatimModuleSyntax
 [file extensions are mandatory]: esm.md#mandatory-file-extensions
+[full support]: #full-typescript-support
 [the same way as `.js` files.]: packages.md#determining-module-system
+[type stripping]: #type-stripping

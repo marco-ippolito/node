@@ -145,7 +145,6 @@ a `node_modules` path.
 [ES Modules]: esm.md
 [Full TypeScript support]: #full-typescript-support
 [`--experimental-strip-types`]: cli.md#--experimental-strip-types
-[`ERR_UNSUPPORTED_NODE_MODULES_TYPE_STRIPPING`]: errors.md#err_unsupported_node_modules_type_stripping
 [`tsx`]: https://tsx.is/
 [`verbatimModuleSyntax`]: https://www.typescriptlang.org/tsconfig/#verbatimModuleSyntax
 [file extensions are mandatory]: esm.md#mandatory-file-extensions

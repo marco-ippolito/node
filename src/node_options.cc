@@ -640,6 +640,13 @@ EnvironmentOptionsParser::EnvironmentOptionsParser() {
             "set environment variables from supplied file",
             &EnvironmentOptions::env_file);
   Implies("--env-file", "[has_env_file_string]");
+  AddOption("[has_rc_file_string]",
+            "",
+            &EnvironmentOptions::has_rc_file_string);
+  AddOption("--experimental-rc-file",
+            "set rc config file from supplied file",
+            &EnvironmentOptions::rc_file);
+  Implies("--experimental-rc-file", "[has_rc_file_string]");
   AddOption("--test",
             "launch test runner on startup",
             &EnvironmentOptions::test_runner);

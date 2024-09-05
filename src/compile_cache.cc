@@ -193,6 +193,61 @@ void CompileCacheHandler::ReadCacheFile(CompileCacheEntry* entry) {
   Debug(" success, size=%d\n", total_read);
 }
 
+CompileCacheEntry* CompileCacheHandler::Get(v8::Local<v8::String> code,
+                                            v8::Local<v8::String> filename,
+                                            CachedCodeType type) {
+  DCHECK(!compile_cache_dir_.empty());
+
+  Utf8Value filename_utf8(isolate_, filename);
+  uint32_t key = GetCacheKey(filename_utf8.ToStringView(), type);
+
+  // TODO(joyeecheung): don't encode this again into UTF8. If we read the
+  // UTF8 content on disk as raw buffer (from the JS layer, while watching out
+  // for monkey patching), we can just hash it directly.
+  Utf8Value code_utf8(isolate_, code);
+  uint32_t code_hash = GetHash(code_utf8.out(), code_utf8.length());
+  auto loaded = compiler_cache_store_.find(key);
+
+  // TODO(joyeecheung): let V8's in-isolate compilation cache take precedence.
+  if (loaded != compiler_cache_store_.end() &&
+      loaded->second->code_hash == code_hash) {
+    return loaded->second.get();
+  }
+  return nullptr;
+}
+
+CompileCacheEntry* CompileCacheHandler::Set(v8::Local<v8::String> code,
+                                            v8::Local<v8::String> filename,
+                                            CachedCodeType type) {
+  DCHECK(!compile_cache_dir_.empty());
+
+  Utf8Value filename_utf8(isolate_, filename);
+  uint32_t key = GetCacheKey(filename_utf8.ToStringView(), type);
+  Utf8Value code_utf8(isolate_, code);
+  uint32_t code_hash = GetHash(code_utf8.out(), code_utf8.length());
+  auto emplaced =
+      compiler_cache_store_.emplace(key, std::make_unique<CompileCacheEntry>());
+  auto* result = emplaced.first->second.get();
+
+  std::u8string cache_filename_u8 =
+      (compile_cache_dir_ / Uint32ToHex(key)).u8string();
+  result->code_hash = code_hash;
+  result->code_size = code_utf8.length();
+  result->cache_key = key;
+  result->cache_filename =
+      std::string(cache_filename_u8.begin(), cache_filename_u8.end()) +
+      ".cache";
+  result->source_filename = filename_utf8.ToString();
+  result->cache = nullptr;
+  result->type = type;
+
+  // TODO(joyeecheung): if we fail enough times, stop trying for any future
+  // files.
+  ReadCacheFile(result);
+
+  return result;
+}
+
 CompileCacheEntry* CompileCacheHandler::GetOrInsert(
     v8::Local<v8::String> code,
     v8::Local<v8::String> filename,

@@ -17,6 +17,7 @@ class Environment;
 // TODO(joyeecheung): move it into a CacheHandler class.
 enum class CachedCodeType : uint8_t {
   kCommonJS = 0,
+  kTypeScript = 1,
   kESM,
 };
 
@@ -60,6 +61,12 @@ class CompileCacheHandler {
 
   void Persist();
 
+  CompileCacheEntry* Get(v8::Local<v8::String> code,
+                         v8::Local<v8::String> filename,
+                         CachedCodeType type);
+  CompileCacheEntry* Set(v8::Local<v8::String> code,
+                         v8::Local<v8::String> filename,
+                         CachedCodeType type);
   CompileCacheEntry* GetOrInsert(v8::Local<v8::String> code,
                                  v8::Local<v8::String> filename,
                                  CachedCodeType type);

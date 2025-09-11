@@ -1,0 +1,5 @@
+const foo: string = "Hello, TypeScript!"
+
+console.log(foo);
+
+module.exports = { foo };

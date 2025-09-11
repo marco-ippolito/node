@@ -181,6 +181,10 @@ if (process.env.NODE_V8_COVERAGE) {
   expected.atRunTime.add('Internal Binding profiler');
 }
 
+if (process.config.variables.node_use_amaro) {
+  expected.atRunTime.add('NativeModule internal/deps/amaro/dist/index');
+}
+
 // Accumulate all the errors and print them at the end instead of throwing
 // immediately which makes it harder to update the test.
 const errorLogs = [];

@@ -342,3 +342,23 @@ test('check transform types warning', async () => {
   match(result.stdout, /Hello, TypeScript!/);
   strictEqual(result.code, 0);
 });
+
+test('test extensionless commonjs typescript', async () => {
+  const result = await spawnPromisified(process.execPath, [
+    fixtures.path('typescript/ts/extensionless-cts'),
+  ]);
+
+  strictEqual(result.stderr, '');
+  match(result.stdout, /Hello, TypeScript!/);
+  strictEqual(result.code, 0);
+});
+
+test('test extensionless module typescript', async () => {
+  const result = await spawnPromisified(process.execPath, [
+    fixtures.path('typescript/ts/extensionless-mts'),
+  ]);
+
+  strictEqual(result.stderr, '');
+  match(result.stdout, /Hello, TypeScript!/);
+  strictEqual(result.code, 0);
+});

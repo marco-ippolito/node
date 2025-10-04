@@ -2,6 +2,7 @@
 #include "node_dotenv.h"
 #include "node_errors.h"
 #include "node_external_reference.h"
+#include "node_json_schema_parser.h"
 #include "util-inl.h"
 #include "v8-fast-api-calls.h"
 
@@ -51,8 +52,7 @@ CHAR_TEST(16, IsUnicodeSurrogate, (ch & 0xF800) == 0xD800)
 // If a UTF-16 surrogate is a low/trailing one.
 CHAR_TEST(16, IsUnicodeSurrogateTrail, (ch & 0x400) != 0)
 
-static void GetOwnNonIndexProperties(
-    const FunctionCallbackInfo<Value>& args) {
+static void GetOwnNonIndexProperties(const FunctionCallbackInfo<Value>& args) {
   Environment* env = Environment::GetCurrent(args);
   Local<Context> context = env->context();
 
@@ -65,18 +65,18 @@ static void GetOwnNonIndexProperties(
 
   PropertyFilter filter = FromV8Value<PropertyFilter>(args[1]);
 
-  if (!object->GetPropertyNames(
-        context, KeyCollectionMode::kOwnOnly,
-        filter,
-        IndexFilter::kSkipIndices)
-          .ToLocal(&properties)) {
+  if (!object
+           ->GetPropertyNames(context,
+                              KeyCollectionMode::kOwnOnly,
+                              filter,
+                              IndexFilter::kSkipIndices)
+           .ToLocal(&properties)) {
     return;
   }
   args.GetReturnValue().Set(properties);
 }
 
-static void GetConstructorName(
-    const FunctionCallbackInfo<Value>& args) {
+static void GetConstructorName(const FunctionCallbackInfo<Value>& args) {
   CHECK(args[0]->IsObject());
 
   Local<Object> object = args[0].As<Object>();
@@ -85,8 +85,7 @@ static void GetConstructorName(
   args.GetReturnValue().Set(name);
 }
 
-static void GetExternalValue(
-    const FunctionCallbackInfo<Value>& args) {
+static void GetExternalValue(const FunctionCallbackInfo<Value>& args) {
   CHECK(args[0]->IsExternal());
   Isolate* isolate = args.GetIsolate();
   Local<External> external = args[0].As<External>();
@@ -99,15 +98,14 @@ static void GetExternalValue(
 
 static void GetPromiseDetails(const FunctionCallbackInfo<Value>& args) {
   // Return undefined if it's not a Promise.
-  if (!args[0]->IsPromise())
-    return;
+  if (!args[0]->IsPromise()) return;
 
   auto isolate = args.GetIsolate();
 
   Local<Promise> promise = args[0].As<Promise>();
 
   int state = promise->State();
-  Local<Value> values[2] = { Integer::New(isolate, state) };
+  Local<Value> values[2] = {Integer::New(isolate, state)};
   size_t number_of_values = 1;
   if (state != Promise::PromiseState::kPending)
     values[number_of_values++] = promise->Result();
@@ -117,8 +115,7 @@ static void GetPromiseDetails(const FunctionCallbackInfo<Value>& args) {
 
 static void GetProxyDetails(const FunctionCallbackInfo<Value>& args) {
   // Return undefined if it's not a proxy.
-  if (!args[0]->IsProxy())
-    return;
+  if (!args[0]->IsProxy()) return;
 
   Local<Proxy> proxy = args[0].As<Proxy>();
 
@@ -126,10 +123,7 @@ static void GetProxyDetails(const FunctionCallbackInfo<Value>& args) {
   // the util binding layer. It's accessed in the wild and `esm` would break in
   // case the check is removed.
   if (args.Length() == 1 || args[1]->IsTrue()) {
-    Local<Value> ret[] = {
-      proxy->GetTarget(),
-      proxy->GetHandler()
-    };
+    Local<Value> ret[] = {proxy->GetTarget(), proxy->GetHandler()};
 
     args.GetReturnValue().Set(
         Array::New(args.GetIsolate(), ret, arraysize(ret)));
@@ -165,8 +159,7 @@ static void GetCallerLocation(const FunctionCallbackInfo<Value>& args) {
 }
 
 static void PreviewEntries(const FunctionCallbackInfo<Value>& args) {
-  if (!args[0]->IsObject())
-    return;
+  if (!args[0]->IsObject()) return;
 
   Environment* env = Environment::GetCurrent(args);
   bool is_key_value;
@@ -174,13 +167,9 @@ static void PreviewEntries(const FunctionCallbackInfo<Value>& args) {
   if (!args[0].As<Object>()->PreviewEntries(&is_key_value).ToLocal(&entries))
     return;
   // Fast path for WeakMap and WeakSet.
-  if (args.Length() == 1)
-    return args.GetReturnValue().Set(entries);
+  if (args.Length() == 1) return args.GetReturnValue().Set(entries);
 
-  Local<Value> ret[] = {
-    entries,
-    Boolean::New(env->isolate(), is_key_value)
-  };
+  Local<Value> ret[] = {entries, Boolean::New(env->isolate(), is_key_value)};
   return args.GetReturnValue().Set(
       Array::New(env->isolate(), ret, arraysize(ret)));
 }
@@ -453,6 +442,8 @@ void RegisterExternalReferences(ExternalReferenceRegistry* registry) {
   registry->Register(GuessHandleType);
   registry->Register(fast_guess_handle_type_);
   registry->Register(ParseEnv);
+  registry->Register(node::json_schema_parser::JSONSchemaParser::New);
+  registry->Register(node::json_schema_parser::JSONSchemaParser::Parse);
   registry->Register(IsInsideNodeModules);
   registry->Register(DefineLazyProperties);
   registry->Register(DefineLazyPropertiesGetter);
@@ -555,6 +546,9 @@ void Initialize(Local<Object> target,
   SetMethodNoSideEffect(context, target, "getCallSites", GetCallSites);
   SetMethod(context, target, "sleep", Sleep);
   SetMethod(context, target, "parseEnv", ParseEnv);
+
+  // Initialize the JSONSchemaParser class
+  node::json_schema_parser::JSONSchemaParser::Initialize(env, target);
 
   SetMethod(
       context, target, "arrayBufferViewHasBuffer", ArrayBufferViewHasBuffer);

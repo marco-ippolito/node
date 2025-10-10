@@ -1,0 +1,70 @@
+name: Filter Spam
+
+on:
+  pull_request_target:
+    types: [opened]
+    paths:
+      - README.md
+
+env:
+  NODE_VERSION: lts/*
+  CLOSE_MESSAGE: >
+    This pull request was closed because it was identified as spam.
+    If you feel closing this pull request is not the right thing
+    to do, please reopen it.
+
+jobs:
+  filter:
+    if: github.repository == 'nodejs/node'
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - name: Check Body
+        id: check-body
+        env:
+          BODY: ${{ github.event.pull_request.body }}
+        run: |
+          if [[ -z "$BODY" || "$BODY" =~ ^[[:space:]]*$ ]]; then
+            echo "body-valid=false" >> $GITHUB_OUTPUT
+          else
+            echo "body-valid=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Compute number of commits in the PR
+        id: nb-of-commits
+        run: |
+          echo "plusOne=$((${{ github.event.pull_request.commits }} + 1))" >> $GITHUB_OUTPUT
+          echo "minusOne=$((${{ github.event.pull_request.commits }} - 1))" >> $GITHUB_OUTPUT
+
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8  # v5.0.0
+        with:
+          fetch-depth: ${{ steps.nb-of-commits.outputs.plusOne }}
+          persist-credentials: false
+
+      - run: git reset HEAD^2
+
+      - name: Install Node.js
+        uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444  # v5.0.0
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Validate commit message
+        id: validate-commit
+        continue-on-error: true
+        run: |
+          echo "::add-matcher::.github/workflows/commit-lint-problem-matcher.json"
+          if git rev-parse HEAD~${{ steps.nb-of-commits.outputs.minusOne }} | xargs npx -q core-validate-commit --no-validate-metadata --tap; then
+            echo "commit-valid=true" >> $GITHUB_OUTPUT
+          else
+            echo "commit-valid=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Add labels and close PR if spam
+        if: steps.check-body.outputs.body-valid == 'false' && steps.validate-commit.outputs.commit-valid == 'false'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          gh pr edit "$NUMBER" --repo ${{ github.repository }} --add-label "invalid"
+          gh pr close "$NUMBER" --repo ${{ github.repository }} --comment "$CLOSE_MESSAGE"

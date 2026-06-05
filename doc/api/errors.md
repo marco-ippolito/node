@@ -3463,6 +3463,12 @@ added: v18.1.0
 The `Response` that has been passed to `WebAssembly.compileStreaming` or to
 `WebAssembly.instantiateStreaming` is not a valid WebAssembly response.
 
+<a id="ERR_WEB_HTTP_BODY_LIMIT"></a>
+
+### `ERR_WEB_HTTP_BODY_LIMIT`
+
+The Web HTTP request body exceeded the configured `bodyLimit`.
+
 <a id="ERR_WORKER_INIT_FAILED"></a>
 
 ### `ERR_WORKER_INIT_FAILED`

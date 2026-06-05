@@ -48,6 +48,185 @@ list like the following:
   "accepT", "*/*" ]
 ```
 
+## `node:http/web`
+
+<!-- YAML
+added: REPLACEME
+-->
+
+> Stability: 1 - Experimental
+
+The `node:http/web` module provides an experimental HTTP/1.1 server API that
+uses Web [`Request`][] and [`Response`][] objects.
+
+The module is available only when Node.js is started with the
+[`--experimental-web-http-server`][] CLI flag.
+
+```bash
+node --experimental-web-http-server server.mjs
+```
+
+```mjs
+import { createServer } from 'node:http/web';
+
+const server = createServer(async (ctx) => {
+  const { request } = ctx;
+  return new Response(`Hello ${new URL(request.url).pathname}`);
+});
+
+await server.listen(3000);
+```
+
+### `httpWeb.createServer([options, ]handler)`
+
+<!-- YAML
+added: REPLACEME
+-->
+
+* `options` {Object}
+  * `bodyLimit` {number} Maximum request body size in bytes.
+    **Default:** `1048576`.
+  * `headersTimeout` {number} Time in milliseconds to receive request headers.
+    Use `0` to disable this timeout. **Default:** `60000`.
+  * `keepAliveTimeout` {number} Time in milliseconds to keep an idle
+    keep-alive connection open. Use `0` to disable this timeout.
+    **Default:** `72000`.
+  * `maxHeaderSize` {number} Maximum request header size in bytes.
+    **Default:** [`--max-http-header-size`][].
+  * `requestTimeout` {number} Time in milliseconds to receive a request body.
+    Use `0` to disable this timeout. **Default:** `0`.
+* `handler` {Function} Receives `(ctx)`.
+* Returns: {Object}
+
+Creates an HTTP server. The `handler` receives a context object. The Web
+[`Request`][] is available as `ctx.request` and is created lazily.
+
+```mjs
+const server = createServer(async (ctx) => {
+  const { request } = ctx;
+  return new Response(await request.text());
+});
+```
+
+#### Handler arguments
+
+* `ctx` {Object}
+  * `request` {Request} The Web [`Request`][] object. This is created lazily
+    on first access.
+  * `hijack` {Function} Returns protocol data and writer methods.
+
+Calling `ctx.hijack()` disables automatic [`Response`][] handling for the
+current request. The returned object has the following properties:
+
+* `method` {string}
+* `url` {string}
+* `headers` {Headers}
+* `body` {ReadableStream}
+* `writeHead(status[, headers])` {Function} Writes the response status line
+  and headers.
+* `write(chunk)` {Function} Writes response body data.
+* `end([chunk])` {Function} Finishes the response.
+
+
+```mjs
+const server = createServer(async (ctx) => {
+  const res = ctx.hijack();
+  res.writeHead(200, { 'content-type': 'text/plain' });
+  res.end('raw response');
+});
+```
+
+### Web HTTP server objects
+
+HTTP server object is created by [`http.createServer()`][].
+
+#### `webServer.listen(port[, host[, backlog]])`
+
+<!-- YAML
+added: REPLACEME
+-->
+
+* `port` {number}
+* `host` {string}
+* `backlog` {number}
+* `options` {Object}
+  * `port` {number}
+  * `host` {string}
+  * `backlog` {number}
+* Returns: {Promise} Resolves with `webServer`.
+
+Starts listening for connections.
+
+The default `host` is `'0.0.0.0'`. Host name resolution is not supported.
+
+#### `webServer.close()`
+
+<!-- YAML
+added: REPLACEME
+-->
+
+* Returns: {Promise|undefined}
+
+Closes the server. If the server is not listening and no close operation is
+pending, this returns `undefined`.
+
+#### `webServer.address()`
+
+<!-- YAML
+added: REPLACEME
+-->
+
+* Returns: {Object|null}
+
+Returns the bound address, or `null` when the server is not listening.
+
+#### `webServer.inject(request)`
+
+<!-- YAML
+added: REPLACEME
+-->
+
+* `request` {Request}
+* Returns: {Promise} Resolves with a [`Response`][].
+
+Runs a [`Request`][] through the handler without opening a network
+connection. `webServer.inject()` only accepts Web [`Request`][] instances.
+
+```mjs
+const server = createServer(() => new Response('ok'));
+const response = await server.inject(new Request('http://localhost/'));
+
+console.log(await response.text()); // ok
+```
+
+#### `webServer[Symbol.asyncDispose]()`
+
+<!-- YAML
+added: REPLACEME
+-->
+
+* Returns: {Promise|undefined}
+
+Calls [`webServer.close()`][].
+
+### HTTP/1.1 behavior
+
+The Web HTTP server supports the following HTTP/1.1 behavior:
+
+* `Content-Length` and chunked request bodies.
+* Keep-alive and `Connection: close`.
+* Pipelined request parsing with ordered response writes.
+* Concurrent handler execution.
+* Streamed Web [`Response`][] bodies with backpressure.
+* Chunked responses when the content length is unknown.
+* No-body responses for `HEAD`, `204`, `205`, and `304`.
+
+Malformed requests are answered with `400` and the connection is closed. Handler
+errors before `hijack()` sends data are answered with `500` and the
+connection is closed.
+
+`CONNECT`, `Upgrade`, WebSocket, and trailers are not supported.
+
 ## Class: `http.Agent`
 
 <!-- YAML
@@ -4707,6 +4886,7 @@ const agent2 = new http.Agent({ proxyEnv: process.env });
 [`'request'`]: #event-request
 [`'response'`]: #event-response
 [`'upgrade'`]: #event-upgrade
+[`--experimental-web-http-server`]: cli.md#--experimental-web-http-server
 [`--insecure-http-parser`]: cli.md#--insecure-http-parser
 [`--max-http-header-size`]: cli.md#--max-http-header-sizesize
 [`Agent`]: #class-httpagent
@@ -4714,6 +4894,8 @@ const agent2 = new http.Agent({ proxyEnv: process.env });
 [`Duplex`]: stream.md#class-streamduplex
 [`HPE_HEADER_OVERFLOW`]: errors.md#hpe_header_overflow
 [`Headers`]: globals.md#class-headers
+[`Request`]: globals.md#request
+[`Response`]: globals.md#response
 [`TypeError`]: errors.md#class-typeerror
 [`URL`]: url.md#the-whatwg-url-api
 [`agent.createConnection()`]: #agentcreateconnectionoptions-callback
@@ -4732,6 +4914,7 @@ const agent2 = new http.Agent({ proxyEnv: process.env });
 [`http.globalAgent`]: #httpglobalagent
 [`http.request()`]: #httprequestoptions-callback
 [`http.setGlobalProxyFromEnv()`]: #httpsetglobalproxyfromenvproxyenv
+[`httpWeb.createServer()`]: #httpwebcreateserveroptions-handler
 [`message.headers`]: #messageheaders
 [`message.rawHeaders`]: #messagerawheaders
 [`message.socket`]: #messagesocket
@@ -4785,6 +4968,7 @@ const agent2 = new http.Agent({ proxyEnv: process.env });
 [`socket.unref()`]: net.md#socketunref
 [`stream.getDefaultHighWaterMark()`]: stream.md#streamgetdefaulthighwatermarkobjectmode
 [`url.parse()`]: url.md#urlparseurlstring-parsequerystring-slashesdenotehost
+[`webServer.close()`]: #webserverclose
 [`writable.cork()`]: stream.md#writablecork
 [`writable.destroy()`]: stream.md#writabledestroyerror
 [`writable.destroyed`]: stream.md#writabledestroyed

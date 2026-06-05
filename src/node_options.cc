@@ -600,6 +600,10 @@ EnvironmentOptionsParser::EnvironmentOptionsParser() {
             &EnvironmentOptions::experimental_websocket,
             kAllowedInEnvvar,
             true);
+  AddOption("--experimental-web-http-server",
+            "experimental Web HTTP server API",
+            &EnvironmentOptions::experimental_web_http_server,
+            kAllowedInEnvvar);
   AddOption("--experimental-global-customevent", "", NoOp{}, kAllowedInEnvvar);
   AddOption("--experimental-sqlite",
             "experimental node:sqlite module",

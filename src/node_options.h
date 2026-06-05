@@ -130,6 +130,7 @@ class EnvironmentOptions : public Options {
   bool experimental_eventsource = EXPERIMENTALS_DEFAULT_VALUE;
   bool experimental_ffi = EXPERIMENTALS_DEFAULT_VALUE;
   bool experimental_websocket = true;
+  bool experimental_web_http_server = EXPERIMENTALS_DEFAULT_VALUE;
   bool experimental_sqlite = HAVE_SQLITE;
   bool experimental_stream_iter = EXPERIMENTALS_DEFAULT_VALUE;
   bool experimental_vfs = EXPERIMENTALS_DEFAULT_VALUE;

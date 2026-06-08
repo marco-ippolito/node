@@ -20,6 +20,7 @@ on:
           - brotli
           - c-ares
           - merve
+          - milo
           - corepack
           - googletest
           - gyp-next
@@ -113,6 +114,14 @@ jobs:
             label: dependencies
             run: |
               ./tools/dep_updaters/update-merve.sh > temp-output
+              cat temp-output
+              tail -n1 temp-output | grep "NEW_VERSION=" >> "$GITHUB_ENV" || true
+              rm temp-output
+          - id: milo
+            subsystem: deps
+            label: dependencies
+            run: |
+              ./tools/dep_updaters/update-milo.sh > temp-output
               cat temp-output
               tail -n1 temp-output | grep "NEW_VERSION=" >> "$GITHUB_ENV" || true
               rm temp-output

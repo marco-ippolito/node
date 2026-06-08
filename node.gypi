@@ -446,6 +446,11 @@
     }, {
       'defines': [ 'HAVE_AMARO=0' ]
     }],
+    [ 'node_use_milo=="true"', {
+      'defines': [ 'HAVE_MILO=1' ],
+    }, {
+      'defines': [ 'HAVE_MILO=0' ]
+    }],
     [ 'node_use_sqlite=="true"', {
       'defines': [ 'HAVE_SQLITE=1' ],
     }, {

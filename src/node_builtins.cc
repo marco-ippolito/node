@@ -149,6 +149,7 @@ BuiltinLoader::BuiltinCategories BuiltinLoader::GetBuiltinCategories() const {
 #endif                  // !HAVE_FFI
         "dtls",         // Experimental.
         "ffi",          // Experimental.
+        "http/web",     // Experimental.
         "quic",         // Experimental.
         "sqlite",       // Experimental.
         "stream/iter",  // Experimental.

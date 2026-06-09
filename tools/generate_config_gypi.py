@@ -62,6 +62,7 @@ def translate_config(out_dir, config, v8_config):
       'node_module_version': int(config['node_module_version']),
       'node_use_openssl': config['node_use_openssl'],
       'node_use_amaro': config['node_use_amaro'],
+      'node_use_milo': config['node_use_milo'],
       'node_use_node_code_cache': config['node_use_node_code_cache'],
       'node_use_node_snapshot': config['node_use_node_snapshot'],
       'v8_enable_inspector':  # this is actually a node misnomer

@@ -998,6 +998,12 @@ parser.add_argument('--without-lief',
     default=None,
     help='build without LIEF (Library for instrumenting executable formats)')
 
+parser.add_argument('--without-milo',
+    action='store_true',
+    dest='without_milo',
+    default=None,
+    help='do not install the bundled Milo (HTTP/1.1 parser)')
+
 parser.add_argument('--without-npm',
     action='store_true',
     dest='without_npm',
@@ -1831,6 +1837,10 @@ def configure_node(o):
   o['variables']['node_install_corepack'] = b(options.with_corepack)
   o['variables']['control_flow_guard'] = b(options.enable_cfg)
   o['variables']['node_use_amaro'] = b(not options.without_amaro)
+  o['variables']['node_use_milo'] = b(not options.without_milo)
+  o['variables']['node_milo_files'] = [] if options.without_milo else [
+    'deps/milo/src/simd/index.js'
+  ]
   o['variables']['debug_node'] = b(options.debug_node)
   o['variables']['debug_symbols'] = b(options.debug_symbols)
   if options.debug_symbols:

@@ -1483,6 +1483,16 @@ changes:
 
 Enable experimental WebAssembly System Interface (WASI) support.
 
+### `--experimental-web-http-server`
+
+<!-- YAML
+added: REPLACEME
+-->
+
+> Stability: 1 - Experimental
+
+Enable the experimental `node:http/web` server module.
+
 ### `--experimental-worker-inspection`
 
 <!-- YAML
@@ -3799,6 +3809,7 @@ one is included in the list below.
 * `--experimental-vfs`
 * `--experimental-vm-modules`
 * `--experimental-wasi-unstable-preview1`
+* `--experimental-web-http-server`
 * `--force-context-aware`
 * `--force-fips`
 * `--force-node-api-uncaught-exceptions-policy`

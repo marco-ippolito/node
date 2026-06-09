@@ -80,6 +80,14 @@ declare_args() {
 
   # Build with Amaro (TypeScript utils).
   node_use_amaro = true
+
+  # Build with Milo (HTTP/1.1 parser).
+  node_use_milo = true
+}
+
+node_milo_files = []
+if (node_use_milo) {
+  node_milo_files += [ "deps/milo/src/simd/index.js" ]
 }
 
 assert(!node_enable_inspector || node_use_openssl,

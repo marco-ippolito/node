@@ -11,6 +11,7 @@ This a list of all the dependencies:
 * [acorn][]
 * [ada][]
 * [amaro][]
+* [milo][]
 * [base64][]
 * [brotli][]
 * [c-ares][]
@@ -230,6 +231,11 @@ fast and spec-compliant URL parser written in C++.
 The [amaro](https://www.npmjs.com/package/amaro) dependency is a wrapper around the
 WebAssembly version of the SWC JavaScript/TypeScript parser.
 
+### milo
+
+The [milo](https://www.npmjs.com/package/@perseveranza-pets/milo-cjs)
+dependency is a WebAssembly HTTP/1.1 parser.
+
 ### brotli
 
 The [brotli](https://github.com/google/brotli) dependency is
@@ -434,6 +440,7 @@ according to [RFC 8878](https://datatracker.ietf.org/doc/html/rfc8878).
 [maintaining-openssl]: ./maintaining-openssl.md
 [maintaining-web-assembly]: ./maintaining-web-assembly.md
 [merve]: #merve
+[milo]: #milo
 [minimatch]: #minimatch
 [nghttp2]: #nghttp2
 [nghttp3]: #nghttp3

@@ -42,6 +42,11 @@ template("node_gn_build") {
     } else {
       defines += [ "HAVE_AMARO=0" ]
     }
+    if (node_use_milo) {
+      defines += [ "HAVE_MILO=1" ]
+    } else {
+      defines += [ "HAVE_MILO=0" ]
+    }
     if (node_use_v8_platform) {
       defines += [ "NODE_USE_V8_PLATFORM=1" ]
     } else {
@@ -148,7 +153,8 @@ template("node_gn_build") {
 
   gypi_values = exec_script("./tools/gypi_to_gn.py",
                             [ rebase_path("node.gyp"),
-                              "--replace=<@(node_builtin_shareable_builtins)=" ],
+                              "--replace=<@(node_builtin_shareable_builtins)=",
+                              "--replace=<@(node_milo_files)=" ],
                             "scope",
                             [ "node.gyp" ])
 
@@ -347,7 +353,9 @@ template("node_gn_build") {
       ":generate_config_gypi",
     ]
 
-    node_deps_files = gypi_values.deps_files + node_builtin_shareable_builtins
+    node_deps_files = gypi_values.deps_files +
+                      node_builtin_shareable_builtins +
+                      node_milo_files
     node_library_files = exec_script("./tools/search_files.py",
                                      [ rebase_path(".", root_build_dir),
                                        rebase_path("lib", root_build_dir),

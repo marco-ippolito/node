@@ -38,6 +38,7 @@
     'node_shared%': 'false',
     'node_snapshot_main%': '',
     'node_use_amaro%': 'true',
+    'node_use_milo%': 'true',
     'node_use_bundled_v8%': 'true',
     'node_use_lief%': 'false',
     'node_use_node_snapshot%': 'false',
@@ -52,6 +53,9 @@
     'node_write_snapshot_as_string_literals': 'true',
     'ossfuzz' : 'false',
     'linked_module_files': [
+    ],
+    'node_milo_files%': [
+      'deps/milo/src/simd/index.js',
     ],
     # We list the deps/ files out instead of globbing them in js2c.cc since we
     # only include a subset of all the files under these directories.
@@ -78,6 +82,7 @@
       'deps/acorn/acorn-walk/dist/walk.js',
       'deps/minimatch/index.js',
       '<@(node_builtin_shareable_builtins)',
+      '<@(node_milo_files)',
     ],
     'node_sources': [
       'src/api/async_resource.cc',
@@ -138,6 +143,7 @@
       'src/node_file_utils.cc',
       'src/node_http_parser.cc',
       'src/node_http2.cc',
+      'src/node_web_http_server.cc',
       'src/node_i18n.cc',
       'src/node_locks.cc',
       'src/node_main_instance.cc',

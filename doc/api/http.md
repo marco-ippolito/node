@@ -4698,6 +4698,219 @@ const agent1 = new http.Agent({ proxyEnv: { http_proxy: 'http://proxy.example.co
 const agent2 = new http.Agent({ proxyEnv: process.env });
 ```
 
+## Web HTTP server
+
+<!-- YAML
+added: REPLACEME
+-->
+
+> Stability: 1.0 - Early development
+
+<!-- source_link=lib/internal/http_web_server.js -->
+
+The Web HTTP server is an experimental server with a
+Web-platform API surface (`Request`/`Response`). It is gated behind the
+`--experimental-web-http-server` command-line flag and exposed through the
+specifier `node:http/web`.
+
+```mjs
+import { createServer } from 'node:http/web';
+
+const server = createServer(() => new Response('Hello World'));
+
+await server.listen(3000);
+```
+
+### Two levels of control
+
+The Web HTTP server exposes the request and the response at two levels, so
+high-level convenience does not come at the cost of low-level access. A handler
+mixes levels freely (for example a high-level request with a low-level
+response), with one rule: the request body may be read at one level only.
+
+#### High-level request
+
+`ctx.request` is a standard Web [`Request`][], materialized lazily on first
+access. Read headers from `ctx.request.headers`, and the body as a Web
+[`ReadableStream`][] (`ctx.request.body`) or one-shot
+(`await ctx.request.text()` / `.json()` / `.arrayBuffer()`):
+
+```mjs
+import { createServer } from 'node:http/web';
+
+const server = createServer(async (ctx) => {
+  const { method } = ctx.request;
+  const payload = await ctx.request.json();
+  return Response.json({ method, payload });
+});
+
+await server.listen(3000);
+```
+
+#### High-level response
+
+Return a Web [`Response`][] (or a promise for one) from the handler:
+
+```mjs
+const server = createServer(() => new Response('Hello World'));
+```
+
+A fixed-body `Response` sends a `Content-Length` automatically. To stream a
+response, return a `Response` built from a [`ReadableStream`][]; it is sent with
+`Transfer-Encoding: chunked`:
+
+```mjs
+const server = createServer(() => {
+  const encoder = new TextEncoder();
+  const stream = new ReadableStream({
+    start(controller) {
+      controller.enqueue(encoder.encode('Hello '));
+      controller.enqueue(encoder.encode('World'));
+      controller.close();
+    },
+  });
+  return new Response(stream);
+});
+```
+
+#### Low-level request
+
+`ctx.hijack()` switches off automatic `Response` handling and returns a protocol
+object exposing `method`, `url`, `headers`, and `body`.
+`body` is a single-consumer async iterable of `Uint8Array`
+chunks with a `bytes()` method that resolves the whole body at once:
+
+```mjs
+const server = createServer(async (ctx) => {
+  const h = ctx.hijack();
+  let total = 0;
+  for await (const chunk of h.body) total += chunk.byteLength;
+  // Or read it all at once: const body = await h.body.bytes();
+  h.end(`received ${total} bytes`);
+});
+```
+
+#### Low-level response
+
+The hijack object writes the response directly with `writeHead(status[,
+headers])`, `write(chunk)`, `writev(chunks)`, and `end([chunk])`. Writes are
+buffered and sent at `end()`, and the `Content-Length` is computed for you, so a
+fixed response is just `writeHead()` plus `end()`:
+
+```mjs
+const server = createServer((ctx) => {
+  const h = ctx.hijack();
+  h.writeHead(200, [['content-type', 'application/json']]);
+  h.end(JSON.stringify({ hello: 'world' }));
+});
+```
+
+Header values may be strings or numbers. `write()` and `writev()` accept
+strings, `Buffer`s, and any `ArrayBufferView`;
+`writev()` sends several pieces as one response:
+
+```mjs
+const server = createServer((ctx) => {
+  const h = ctx.hijack();
+  h.writeHead(200, [['content-type', 'application/octet-stream']]);
+  h.writev([new Uint8Array([1, 2, 3]), new Uint8Array([4, 5, 6])]);
+  h.end();
+});
+```
+
+#### Error handling
+
+If the handler throws (or returns a rejected promise) before hijacking, the
+client receives a `500 Internal Server Error` with `Connection: close`, and the
+error is surfaced through the process `'uncaughtException'` event with its
+full stack, it is **not** swallowed. By default an unhandled error terminates
+the process, as for any unhandled error in Node.js.
+An application that wants to keep serving should catch errors inside its handler.
+
+### `createServer(handler[, options])`
+
+<!-- YAML
+added: REPLACEME
+-->
+
+* `handler` {Function} Called once per request with a single `ctx` argument.
+  May be synchronous (returning a `Response`) or asynchronous (returning a
+  promise for one). If it calls `ctx.hijack()`, it is responsible for ending
+  the response itself.
+* `options` {Object}
+  * `bodyLimit` {integer} Maximum request body size in bytes. A request whose
+    body exceeds this limit is answered with `413 Payload Too Large`.
+    **Default:** `1048576` (1 MiB).
+  * `headersTimeout` {integer} Milliseconds to receive the complete request
+    headers. `0` disables the timeout.
+    **Default:** `60000`, capped at `requestTimeout` when that is smaller.
+  * `requestTimeout` {integer} Milliseconds to receive the complete request.
+    When both `headersTimeout` and `requestTimeout` are non-zero,
+    `headersTimeout` must be `<= requestTimeout`. `0` disables the timeout.
+    **Default:** `300000`.
+  * `keepAliveTimeout` {integer} Milliseconds of idle time before a keep-alive
+    connection is closed. **Default:** `72000`.
+  * `maxHeaderSize` {integer} Maximum size of request headers in bytes.
+    Exceeding it is answered with `431 Request Header Fields Too Large`.
+    **Default:** the value of [`--max-http-header-size`][].
+  * `maxInflightRequests` {integer} Maximum number of requests from a single
+    connection that may be in flight (dispatched to the handler but not yet
+    answered) at once. When the limit is reached, further pipelined requests are
+    queued and reads are paused until in-flight responses drain, bounding the
+    memory a single connection can consume by pipelining. **Default:** `1024`.
+  * `protocols` {string\[]} HTTP versions the server may negotiate. Currently
+    only `['h1']` (HTTP/1.1) is supported; other values throw. Reserved for
+    future HTTP/2 and HTTP/3 support. **Default:** `['h1']`.
+* Returns: {WebHTTPServer}
+
+`ctx` is the per-request context handed to the handler. It exposes:
+
+* `ctx.request` {Request} A lazily materialized Web [`Request`][].
+  The request body is available
+  as a Web [`ReadableStream`][] via `ctx.request.body`, or one-shot via
+  `ctx.request.text()` / `ctx.request.arrayBuffer()` / `ctx.request.json()`.
+* `ctx.hijack()` {Object} Switches off automatic `Response` handling and returns
+  the low-level protocol writer (`method`, `url`, `headers`, `body`,
+  `writeHead()`, `write()`, `writev()`, `end()`). `hijack().body` is a
+  single-consumer async iterable of `Uint8Array` chunks with a `bytes()` method
+  that resolves the whole body at once. The request body may be consumed via
+  either `ctx.request` or `ctx.hijack().body`, but not both, and only once.
+
+### Class: `WebHTTPServer`
+
+<!-- YAML
+added: REPLACEME
+-->
+
+* `server.listen(port[, host])` Begins accepting connections on the given port.
+  `host` is resolved with DNS when it is not a numeric IP address. Returns a
+  promise that resolves to the server, and rejects on a listen failure.
+* `server.address()` Returns the bound `{ address, family, port }`, or `null`
+  when the server is not listening.
+* `server.close()` Stops accepting new connections and destroys active ones.
+  Returns a promise that resolves when the listening socket has closed, or
+  `undefined` for a no-op close.
+* `server.closeAllConnections()` Forcibly destroys all active connections
+  without closing the listening socket.
+* `server.inject(request)` Dispatches a Web [`Request`][] directly to the
+  handler without using the network and resolves with the resulting
+  [`Response`][]. Useful for testing.
+* `server[Symbol.asyncDispose]()` Equivalent to awaiting `server.close()`.
+
+### Testing with `server.inject()`
+
+`server.inject()` dispatches a Web [`Request`][] straight to the handler and
+resolves with the resulting [`Response`][], without opening a socket — useful in
+unit tests:
+
+```mjs
+import { createServer } from 'node:http/web';
+
+const server = createServer((ctx) => new Response(ctx.request.method));
+const response = await server.inject(new Request('http://example.test/'));
+console.log(await response.text());  // 'GET'
+```
+
 [Built-in Proxy Support]: #built-in-proxy-support
 [RFC 8187]: https://www.rfc-editor.org/rfc/rfc8187.txt
 [RFC 9110 Section 6.6.1]: https://www.rfc-editor.org/rfc/rfc9110#section-6.6.1
@@ -4714,6 +4927,9 @@ const agent2 = new http.Agent({ proxyEnv: process.env });
 [`Duplex`]: stream.md#class-streamduplex
 [`HPE_HEADER_OVERFLOW`]: errors.md#hpe_header_overflow
 [`Headers`]: globals.md#class-headers
+[`ReadableStream`]: webstreams.md#class-readablestream
+[`Request`]: globals.md#class-request
+[`Response`]: globals.md#class-response
 [`TypeError`]: errors.md#class-typeerror
 [`URL`]: url.md#the-whatwg-url-api
 [`agent.createConnection()`]: #agentcreateconnectionoptions-callback

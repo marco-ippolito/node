@@ -143,6 +143,7 @@
       'src/node_file_utils.cc',
       'src/node_http_parser.cc',
       'src/node_http2.cc',
+      'src/node_web_http_server.cc',
       'src/node_i18n.cc',
       'src/node_locks.cc',
       'src/node_main_instance.cc',

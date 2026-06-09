@@ -610,6 +610,10 @@ EnvironmentOptionsParser::EnvironmentOptionsParser() {
             "experimental iterable streams API (node:stream/iter)",
             &EnvironmentOptions::experimental_stream_iter,
             kAllowedInEnvvar);
+  AddOption("--experimental-web-http-server",
+            "experimental node:http/web server module",
+            &EnvironmentOptions::experimental_web_http_server,
+            kAllowedInEnvvar);
   AddOption("--experimental-dtls",
 #if HAVE_DTLS
             "experimental DTLS support",

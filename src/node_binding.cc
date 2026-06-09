@@ -57,6 +57,7 @@
   V(heap_utils)                                                                \
   V(http2)                                                                     \
   V(http_parser)                                                               \
+  V(web_http_server)                                                           \
   V(inspector)                                                                 \
   V(internal_only_v8)                                                          \
   V(js_stream)                                                                 \

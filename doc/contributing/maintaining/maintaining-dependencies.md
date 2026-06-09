@@ -440,8 +440,8 @@ according to [RFC 8878](https://datatracker.ietf.org/doc/html/rfc8878).
 [maintaining-openssl]: ./maintaining-openssl.md
 [maintaining-web-assembly]: ./maintaining-web-assembly.md
 [merve]: #merve
-[minimatch]: #minimatch
 [milo]: #milo
+[minimatch]: #minimatch
 [nghttp2]: #nghttp2
 [nghttp3]: #nghttp3
 [ngtcp2]: #ngtcp2
